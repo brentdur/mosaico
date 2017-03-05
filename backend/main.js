@@ -161,7 +161,11 @@ app.post('/save', function(req, res) {
 });
 app.post('/load', function(req, res) {
     // console.log(req.body.hash);
-    res.json(JSON.parse(fs.readFileSync('saved.json', 'utf8')));
+    if (req.body.hash === 'master') {
+        res.json(JSON.parse(fs.readFileSync('saved_master.json', 'utf8')));
+    } else {
+        res.json(JSON.parse(fs.readFileSync('saved.json', 'utf8')));
+    }
 });
 
 // This is needed with grunt-express-server (while it was not needed with grunt-express)
