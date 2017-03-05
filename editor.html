@@ -29,26 +29,181 @@ $(function() {
     alert('Update your browser!');
     return;
   }
-  // var basePath = window.location.href.substr(0, window.location.href.lastIndexOf('/')).substr(window.location.href.indexOf('/','https://'.length));
-  var basePath = window.location.href;
-  if (basePath.lastIndexOf('#') > 0) basePath = basePath.substr(0, basePath.lastIndexOf('#'));
-  if (basePath.lastIndexOf('?') > 0) basePath = basePath.substr(0, basePath.lastIndexOf('?'));
-  if (basePath.lastIndexOf('/') > 0) basePath = basePath.substr(0, basePath.lastIndexOf('/'));
-  var plugins;
-  // A basic plugin that expose the "viewModel" object as a global variable.
-  // plugins = [function(vm) {window.viewModel = vm;}];
-  var ok = Mosaico.init({
-    imgProcessorBackend: basePath+'/img/',
-    emailProcessorBackend: basePath+'/dl/',
-    titleToken: "MOSAICO Responsive Email Designer",
-    fileuploadConfig: {
-      url: basePath+'/upload/',
-      // messages??
+
+  var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+      sURLVariables = sPageURL.split('&'),
+      sParameterName,
+      i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+      sParameterName = sURLVariables[i].split('=');
+
+      if (sParameterName[0] === sParam) {
+          return sParameterName[1] === undefined ? true : sParameterName[1];
+      }
     }
-  }, plugins);
-  if (!ok) {
-    console.log("Missing initialization hash, redirecting to main entrypoint");
-    document.location = ".";
+  };
+
+    var hash = getUrlParameter('id');
+    var name = getUrlParameter('name');
+
+
+
+  if (hash){
+
+    $.ajax({
+      url: '/load', // Path to load.php
+      type: 'post',
+      dataType: 'JSON',
+      data: {'hash':hash},
+      success: function(data){
+        console.log(data);
+        var metadata = JSON.parse(data[0]);
+        var content = JSON.parse(data[1]);
+
+        // var basePath = window.location.href.substr(0, window.location.href.lastIndexOf('/')).substr(window.location.href.indexOf('/','https://'.length));
+        var basePath = window.location.href.substr(0, window.location.href.lastIndexOf('/'));
+        var plugins = [
+          // plugin for integrating save button
+          function(viewModel) {
+            console.log('PROCESS PLUGIN');
+
+            var saveCmd = {
+                name: 'Save', // l10n happens in the template
+                enabled: ko.observable(true)
+            };
+
+            var downloadCmd = {
+              name: 'Download', // l10n happens in the template
+              enabled: ko.observable(true)
+            };
+
+            saveCmd.execute = function() {
+              console.log('FIRE SAVE');
+              saveCmd.enabled(false);
+              viewModel.metadata.changed = Date.now();
+              if(typeof viewModel.metadata.key == 'undefined') {
+                  var rnd = Math.random().toString(36).substr(2, 7);
+                  viewModel.metadata.key = rnd;
+              }
+
+              $.ajax({
+                  url:"/save", // Path to save.php
+                  type:"POST",
+                  data:{'hash':viewModel.metadata.key,'metadata':viewModel.exportMetadata(),'content':viewModel.exportJSON()},
+                  success:function(data){
+                      viewModel.notifier.success(viewModel.t('Successfully saved.'));
+                  },
+                  error:function(jqXHR, textStatus, errorMessage){
+                      viewModel.notifier.error(viewModel.t('Saving failed.'));
+                  }
+              }).always(function() {
+                  saveCmd.enabled(true);
+              });
+            };
+
+            downloadCmd.execute = function() {
+              var emailProcessorBackend = "/dl/";
+              downloadCmd.enabled(false);
+              viewModel.notifier.info(viewModel.t("Downloading..."));
+              viewModel.exportHTMLtoTextarea('#downloadHtmlTextarea');
+              var postUrl = emailProcessorBackend;
+              document.getElementById('downloadForm').setAttribute("action", postUrl);
+              document.getElementById('downloadForm').submit();
+              downloadCmd.enabled(true);
+            };
+
+            viewModel.save = saveCmd;
+            viewModel.download = downloadCmd;
+          }
+        ];
+        var ok = Mosaico.start({
+        imgProcessorBackend: basePath + '/img/',
+        emailProcessorBackend: basePath + '/dl/',
+        titleToken: "Email Editor",
+        fileuploadConfig: {
+          url: basePath + '/upload'
+        }
+        }, '/templates/versafix-1/template-versafix-1.html',metadata,content,plugins);
+        if (!ok) {
+            console.log("Missing initialization hash, redirecting to main entrypoint");
+            //document.location = ".";
+          }
+      },
+      error: function( jqXhr, textStatus, errorThrown ){
+          
+      }
+    });
+  } else {
+    // var basePath = window.location.href.substr(0, window.location.href.lastIndexOf('/')).substr(window.location.href.indexOf('/','https://'.length));
+    var basePath = window.location.href.substr(0, window.location.href.lastIndexOf('/'));
+    var plugins = [
+      // plugin for integrating save button
+      function(viewModel) {
+        console.log('PROCESS PLUGIN');
+
+        var saveCmd = {
+            name: 'Save', // l10n happens in the template
+            enabled: ko.observable(true)
+        };
+
+        var downloadCmd = {
+          name: 'Download', // l10n happens in the template
+          enabled: ko.observable(true)
+        };
+
+        saveCmd.execute = function() {
+          console.log('FIRE SAVE');
+          saveCmd.enabled(false);
+          viewModel.metadata.changed = Date.now();
+          if(typeof viewModel.metadata.key == 'undefined') {
+            var rnd = Math.random().toString(36).substr(2, 7);
+            viewModel.metadata.key = rnd;
+          }
+
+          $.ajax({
+            url:"/save", // Path to save.php
+            type:"POST",
+            data:{'name':name,'hash':viewModel.metadata.key,'metadata':viewModel.exportMetadata(),'content':viewModel.exportJSON()},
+            success:function(data){
+                viewModel.notifier.success(viewModel.t('Successfully saved.'));
+            },
+            error:function(jqXHR, textStatus, errorMessage){
+                viewModel.notifier.error(viewModel.t('Saving failed.'));
+            }
+          }).always(function() {
+              saveCmd.enabled(true);
+          });
+        };
+
+        downloadCmd.execute = function() {
+          var emailProcessorBackend = "/dl/";
+          downloadCmd.enabled(false);
+          viewModel.notifier.info(viewModel.t("Downloading..."));
+          viewModel.exportHTMLtoTextarea('#downloadHtmlTextarea');
+          var postUrl = emailProcessorBackend;
+          document.getElementById('downloadForm').setAttribute("action", postUrl);
+          document.getElementById('downloadForm').submit();
+          downloadCmd.enabled(true);
+        };
+
+        viewModel.save = saveCmd;
+        viewModel.download = downloadCmd;
+      }
+    ];
+    var ok = Mosaico.start({
+    imgProcessorBackend: basePath + '/img/',
+    emailProcessorBackend: basePath + '/dl/',
+    titleToken: "Email Editor",
+    fileuploadConfig: {
+      url: basePath + '/upload'
+    }
+    }, basePath + '/templates/versafix-1/template-versafix-1.html',undefined,undefined, plugins);
+    if (!ok) {
+      console.log("Missing initialization hash, redirecting to main entrypoint");
+      //document.location = ".";
+    }
   }
 });
     </script>

@@ -148,6 +148,21 @@ app.post('/dl/', function(req, res) {
     response(req.body.html);
 });
 
+var content;
+var metadata;
+app.post('/save', function(req, res) {
+    // console.log(req.body.hash);
+    // console.log(req.body.name);
+    // console.log(req.body.metadata);
+    // console.log(req.body.content);
+    content = req.body.content;
+    metadata = req.body.metadata;
+    fs.writeFileSync('saved.json', JSON.stringify([metadata, content]));
+});
+app.post('/load', function(req, res) {
+    // console.log(req.body.hash);
+    res.json(JSON.parse(fs.readFileSync('saved.json', 'utf8')));
+});
 
 // This is needed with grunt-express-server (while it was not needed with grunt-express)
 

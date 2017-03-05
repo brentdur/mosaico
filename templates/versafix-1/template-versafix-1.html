@@ -17,7 +17,7 @@
         max: 20;
         help: Attention - this property is not supported on all email clients (i.e. Outlook)
       }
-      face { label: Font; widget: select; options: Arial, Helvetica, sans-serif=Arial|Arial Black, Arial Black, Gadget, sans-serif=Arial Black|Comic Sans MS, Comic Sans MS5, cursive=Comic Sans|Courier New, Courier New, monospace=Courier|Georgia, serif=Georgia|Impact, sans-serif=Impact|Lucida Console, Monaco, monospace=Lucida Console|Lucida Sans Unicode, Lucida Grande, sans-serif=Lucida Sans Unicode|Times New Roman, Times, serif=Times New Roman|Verdana, Geneva, sans-serif=Verdana}
+      face { label: Font; widget: select; options: Arial, Helvetica, sans-serif=Arial|Arial Black, Arial Black, Gadget, sans-serif=Arial Black|Comic Sans MS, Comic Sans MS5, cursive=Comic Sans|Courier New, Courier New, monospace=Courier|Georgia, serif=Georgia|Impact, sans-serif=Impact|Lucida Console, Monaco, monospace=Lucida Console|Lucida Sans Unicode, Lucida Grande, sans-serif=Lucida Sans Unicode|Times New Roman, Times, serif=Times New Roman|Verdana, Geneva, sans-serif=Verdana|Helvetica, Arial, sans-serif=Arial}
       decoration { label: Decoration; widget: select; options: none=None|underline=Underline }
       linksColor { label: Link Color; extend: color }
       linksDecoration { label: Underlined Links?; extend: decoration }
@@ -65,7 +65,7 @@
       textStyle:preview { -ko-bind-text: @['AaZz']; -ko-font-family: @face; -ko-color: @color; -ko-font-size: @[size]px; }
       linkStyle { label: Link; properties: face color size decoration=none }
       linkStyle:preview { -ko-bind-text: @['Link']; -ko-font-size: @[size]px; -ko-font-family: @face; -ko-color: @color; -ko-text-decoration: @[decoration] }
-      longTextStyle { label: Paragraph; properties: face color size linksColor   }
+      longTextStyle { label: Paragraph; properties: face color size linksColor }
       longTextStyle:preview { -ko-bind-text: @['AaZz']; -ko-font-family: @face; -ko-color: @color; -ko-font-size: @[size]px; }
       bigButtonStyle { label: Big Button; extend: buttonStyle }
       titleTextStyle { label: Title; extend: textStyle }
@@ -326,7 +326,7 @@
       -ko-color: @longTextStyle.linksColor;
       text-decoration: underline;
     }
-    [data-ko-block=textBlock] .long-text p { Margin: 1em 0px; }
+    [data-ko-block=textBlock] .long-text p { Margin: 1em 0px; line-height: 150%; }
     [data-ko-block=textBlock] .long-text p:last-child { Margin-bottom: 0px; }
     [data-ko-block=textBlock] .long-text p:first-child { Margin-top: 0px; }
 
@@ -445,7 +445,7 @@
                       -ko-font-size: @[linkStyle.size]px; -ko-color: @linkStyle.color; -ko-font-family: @linkStyle.face">
                       <span style="color: #ffffff; text-decoration: underline;
                         -ko-color: @linkStyle.color; -ko-text-decoration: @linkStyle.decoration">
-                          <a data-ko-editable="webversionText" href="[show_link]" 
+                          <a data-ko-editable="webversionText" href="[LINK_BROWSER]" 
                           style="text-decoration: underline; color: #ffffff;
                            -ko-color: @linkStyle.color; -ko-text-decoration: @linkStyle.decoration">View in your browser</a>
                          </span>
@@ -642,7 +642,7 @@
               <td height="9" style="font-size:1px; line-height: 1px;">&nbsp;</td>
             </tr>
             <tr>
-              <td align="left" style="text-align: left; font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f;
+              <td align="left" style="line-height: 150%; text-align: left; font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f;
                 -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face; -ko-color: @longTextStyle.color"
                 data-ko-editable="longText" class="long-text links-color">
                 <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts. Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean. A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
@@ -716,7 +716,7 @@
         <table width="570" border="0" cellpadding="0" cellspacing="18" class="vb-container fullpad" bgcolor="#ffffff" 
           style="width: 100%; max-width: 570px; background-color: #ffffff; -ko-attr-bgcolor: @backgroundColor; -ko-background-color: @backgroundColor;">
           <tr>
-            <td align="left" style="text-align: left; font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f;
+            <td align="left" style="line-height: 150%; text-align: left; font-size: 13px; font-family: Arial, Helvetica, sans-serif; color: #3f3f3f;
               -ko-font-size: @[longTextStyle.size]px; -ko-font-family: @longTextStyle.face; -ko-color: @longTextStyle.color"
               data-ko-editable="longText" class="long-text links-color">
               <p>Far far away, behind the word mountains, far from the countries <a href="">Vokalia and Consonantia</a>, there live the blind texts.</p>
@@ -1509,13 +1509,6 @@
                 font-weight: normal; font-family: Arial, Helvetica, sans-serif;
                 -ko-text-decoration: @linkStyle.decoration; -ko-color: @[Color.readability(linkStyle.color, backgroundColor) gt 2 ? linkStyle.color : (Color.isReadable('#ffffff', backgroundColor) ? '#ffffff' : '#000000')]; -ko-font-size: @[linkStyle.size]px; -ko-font-family: @linkStyle.face"
                 href="[unsubscribe_link]"><span data-ko-editable="disiscrivitiText">Unsubscribe</span></a>
-            </td>
-          </tr>
-
-          <tr data-ko-display="_root_.sponsor.visible" style="display: none;text-align:center">
-            <td align="center">
-                <a href="" style="-ko-attr-href: @_root_.sponsor.url;"><img border="0" hspace="0" vspace="0" src="img/sponsor.gif" alt="sponsor"
-                  style="Margin:auto;display:inline !important; -ko-attr-src: @_root_.sponsor.src; -ko-attr-alt: @_root_.sponsor.alt" /></a>
             </td>
           </tr>
         </table>
