@@ -85,14 +85,16 @@ $(function() {
               viewModel.metadata.changed = Date.now();
               if(typeof viewModel.metadata.key == 'undefined') {
                   var rnd = Math.random().toString(36).substr(2, 7);
-                  viewModel.metadata.key = rnd;
+              //    viewModel.metadata.key = rnd;
               }
 
               $.ajax({
                   url:"/save", // Path to save.php
                   type:"POST",
-                  data:{'hash':viewModel.metadata.key,'metadata':viewModel.exportMetadata(),'content':viewModel.exportJSON()},
+                  data:{'hash':hash,'metadata':viewModel.exportMetadata(),'content':viewModel.exportJSON(), 'html':viewModel.exportHTML()},
                   success:function(data){
+                      var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?id=' + data.hash;
+                      window.history.pushState({path:newurl},'',newurl);
                       viewModel.notifier.success(viewModel.t('Successfully saved.'));
                   },
                   error:function(jqXHR, textStatus, errorMessage){
@@ -165,8 +167,12 @@ $(function() {
           $.ajax({
             url:"/save", // Path to save.php
             type:"POST",
-            data:{'name':name,'hash':viewModel.metadata.key,'metadata':viewModel.exportMetadata(),'content':viewModel.exportJSON()},
+            data:{'metadata':viewModel.exportMetadata(),'content':viewModel.exportJSON(), 'html':viewModel.exportHTML()},
             success:function(data){
+                console.log(data.hash);
+                viewModel.metadata.key = data.hash;
+                var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?id=' + data.hash;
+                window.history.pushState({path:newurl},'',newurl);
                 viewModel.notifier.success(viewModel.t('Successfully saved.'));
             },
             error:function(jqXHR, textStatus, errorMessage){

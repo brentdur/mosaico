@@ -128,6 +128,13 @@ module.exports = function(grunt) {
         files: ['build/mosaico.debug.js'],
         tasks: ['exorcise']
       },
+	  express: {
+	    files:  [ 'backend/*.js' ],
+	    tasks:  [ 'express:dev' ],
+	    options: {
+	      spawn: false
+	    }
+	  },
       web: {
         options: {
           livereload: true

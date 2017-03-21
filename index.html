@@ -54,9 +54,7 @@
         templates: [{
           name: 'versafix-1', desc: 'The versatile template'
         },{
-          name: 'tedc15', desc: 'The TEDC15 template'
-        },{
-          name: 'tutorial', desc: 'The Tutorial'
+          name: 't@n master', desc: 'The T@N Master template'
         }]
       };
 
@@ -79,7 +77,7 @@
         return d.getDate()+"/"+(m.length == 1 ? '0' : '')+m+"/"+d.getFullYear()+" "+(h.length == 1 ? '0' : '')+h+":"+(i.length == 1 ? '0' : '')+i;
       };
 
-      viewModel.newEdit = function(shorttmplname) {
+      /* viewModel.newEdit = function(shorttmplname) {
         console.log("new", this, template);
         var d = new Date();
         var rnd = Math.random().toString(36).substr(2, 7);
@@ -88,7 +86,7 @@
         document.location = 'editor.html#'+rnd;
         // { data: 'AAAA-MM-GG', key: 'ABCDE' }
         // viewModel.edits.push(template);
-      };
+      }; */
       viewModel.renameEdit = function(index) {
         var newName = window.prompt("Modifica nome", viewModel.edits()[index].name);
         if (newName) {
@@ -331,35 +329,21 @@ $(function() {
     <!-- /ko -->
     <div class="content" style="background-color: white; margin-top: -20px; padding-top: 15px; background-origin: border; padding-bottom: 2em">
     <h3>Try Mosaico first template: more to come soon, stay tuned!</h3>
-    <div data-bind="foreach: templates">
-      <div class="template template-xx" style="" data-bind="attr: { class: 'template template-'+name }">
-        <div class="description" style="padding-bottom:5px"><b data-bind="text: name">xx</b>: <span data-bind="text: desc">xx</span></div>
-        <a href="#" data-bind="click: $root.newEdit.bind(undefined, name), attr: { href: 'editor.html#templates/'+name+'/template-'+name+'.html' }">
-          <img src width="100%" alt="xx" data-bind="attr: { src: 'templates/'+name+'/edres/_full.png' }">
+    <div>
+      <div class="template template-xx" style="">
+        <div class="description" style="padding-bottom:5px"><b>T@N Master</b>: <span>T@N Master template</span></div>
+        <a href="editor.html?id=master">
+          <img src="templates/versafix-1/edres/_full.png" width="100%" alt="xx">
         </a>
       </div>
     </div>
-    </div>
-    <div class="subscribe" style="background-color: #900000; color: white; padding: .5em">
-      <form action="http://mosaico.voxmail.it/user/register"  accept-charset="UTF-8" method="post">
-        <label>Stay up to date about Mosaico main news via email (No spam!): </label>
-        <input type="text" placeholder="email address" maxlength="64" name="mail" value="" class="form-text required" style="border: 0; padding: 5px 10px; box-sizing: border-box;"/>
-        <input type="submit" name="submit" value="Keep in touch!"  class="form-submit" style="background-color: #330000; color: white; border: 0; box-sizing: border-box; border-radius: 3px; padding: 5px 10px" />
-        <input type="hidden" name="form_id" value="user_register"  />
-      </form>
-    </div>
-    <div class="about" style="background-color: #f1eee6; color: #333332; padding: 1em;">
-      <h3>Why MOSAICO?</h3>
-      <p>Designing and coding an email that <strong>works on every device</strong> and every client is a <strong>daunting task</strong> even for professionals.</p>
-      <p>Mosaico allows you to realize <strong>a beautiful and effective template</strong> without a <strong>team of professionals</strong> and hours of testing to make sure it works everywhere.</p>
-      <h3>What does make Mosaico unique?</h3>
-      <p><strong>Responsive and tested Template</strong>, working with <strong>all major email clients and devices</strong></p>
-      <p><strong>Rapid graphic personalization</strong> of the overall theme</p>
-      <p><strong>Flexibility and style customization</strong> of single elements</p>
-      <p>Intuitive <strong>drag &amp; drop image upload</strong> and <strong>automatic resizing</strong> to fit available space</p>
-      <p><strong>Global undo/redo system</strong>: stop wasting time with saves, reviews and confirmations</p>
-      <p><strong>Custom templates support</strong>, with a simple template language (make your html design work on Mosaico in few hours)</p>
-      <p><strong>Open Source</strong>: Mosaico is distributed under the GPL license and the <a href="https://github.com/voidlabs/mosaico">complete code base</a> is available on GitHub</p>
+    <div>
+      <div class="template template-xx" style="">
+        <div class="description" style="padding-bottom:5px"><b>Blank</b>: <span>Default versafix-1 template</span></div>
+        <a href="editor.html">
+          <img src="templates/versafix-1/edres/_full.png" width="100%" alt="xx">
+        </a>
+      </div>
     </div>
     <div class="footer" style="background-color: #3f3d33; color: #d2cbb1; padding: 1em">
       Void Labs Snc 2015® - All rights reserved - P.IVA 02137700395

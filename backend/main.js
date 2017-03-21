@@ -10,6 +10,14 @@ var app = express();
 var gm = require('gm').subClass({imageMagick: true});
 var config = require('../server-config.js');
 var extend = require('util')._extend;
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/test-tan-mosaico');
+var Template = mongoose.model('Template', { 
+  hash: String,
+  metadata: String,
+  content: String,
+  html: String
+});
 
 app.use(require('connect-livereload')({ ignore: [/^\/dl/] }));
 // app.use(require('morgan')('dev'));
@@ -148,25 +156,85 @@ app.post('/dl/', function(req, res) {
     response(req.body.html);
 });
 
+app.get('/list', function(req, res) {
+    // get all objects and return them
+    Template.find({}, 'hash', function(err, objs){
+      return res.json(objs);
+    });
+});
+
 var content;
 var metadata;
-app.post('/save', function(req, res) {
-    // console.log(req.body.hash);
-    // console.log(req.body.name);
-    // console.log(req.body.metadata);
-    // console.log(req.body.content);
+var html;
+app.post('/save', function(req, res) {    
+    var response = function(temp){
+      temp.save(function(err, obj){
+        if (err){res.json(err);}
+        return res.json({hash:id});
+      });
+      fs.writeFileSync('saved.json', JSON.stringify([metadata, content]));
+    };
+    
+    // save object
+    var id = req.body.hash;
     content = req.body.content;
     metadata = req.body.metadata;
-    fs.writeFileSync('saved.json', JSON.stringify([metadata, content]));
+    html = req.body.html;
+    
+    //TODO: ?? edit metadata.key to equal hash ??
+    if (!id || id === 'master'){
+      // generate random id
+      id = Math.random().toString(36).substr(2, 7);
+      var template = new Template({
+        hash:id,
+        content:JSON.stringify(content),
+        metadata:JSON.stringify(metadata),
+        html: JSON.stringify(html)
+      });
+      return response(template);
+    } else {
+      id = req.body.hash;
+      Template.findOne({hash:id}, function(err, obj){
+        if (err) {res.send(err);}
+        obj.content = JSON.stringify(content);
+        obj.metadata = JSON.stringify(metadata);
+        obj.html = JSON.stringify(html);
+        return response(obj);
+      });
+    }
 });
+
 app.post('/load', function(req, res) {
-    // console.log(req.body.hash);
     if (req.body.hash === 'master') {
         res.json(JSON.parse(fs.readFileSync('saved_master.json', 'utf8')));
     } else {
-        res.json(JSON.parse(fs.readFileSync('saved.json', 'utf8')));
+        // load from id
+        Template.findOne({hash:req.body.hash},function(err, obj){
+          if (err || !obj){
+            return res.json(JSON.parse(fs.readFileSync('saved.json', 'utf8')));
+          }
+          return res.json([JSON.parse(obj.metadata), JSON.parse(obj.content)]);
+        });
     }
 });
+
+app.post('/generate', function(req, res) {
+  if (req.query.id) {
+    Template.findOne({hash:req.query.id}, function(err, obj){
+      var html = JSON.parse(obj.html);
+      for (var tag in req.body) {
+      	html = html.replace('[' + tag + ']', req.body[tag]);
+      }
+      res.setHeader('Content-disposition', 'attachment; filename=' + 'email.html');
+      res.setHeader('Content-type', 'text/html');
+      res.write(html);
+      res.end();
+    });
+  } else {
+  	res.send(400);
+  }
+});
+
 
 // This is needed with grunt-express-server (while it was not needed with grunt-express)
 
